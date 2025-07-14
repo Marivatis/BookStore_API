@@ -32,7 +32,7 @@ TBC
 ## How to run
 Run locally:
 ```bash
-go run main.go
+go run cmd/main.go
 ```  
 With Make:
 ```bash
