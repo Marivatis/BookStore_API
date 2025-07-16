@@ -5,5 +5,4 @@ CREATE TABLE products (
     price NUMERIC(10, 2) NOT NULL,
     stock INT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
-
 );

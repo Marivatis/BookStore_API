@@ -7,5 +7,5 @@ CREATE TABLE order_items (
     CONSTRAINT fk_order
          FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     CONSTRAINT fk_books
-         FOREIGN KEY (book_id) REFERENCES books(id)
+         FOREIGN KEY (book_id) REFERENCES books(product_id)
 );
