@@ -1,7 +1,7 @@
-CREATE TABLE books (
+CREATE TABLE magazines (
     product_id INT PRIMARY KEY,
-    author VARCHAR(255),
-    isbn VARCHAR(20),
-    CONSTRAINT fk_product_book
+    issue_number INT,
+    publication_date DATE,
+    CONSTRAINT fk_product_magazine
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
