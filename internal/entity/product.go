@@ -6,14 +6,14 @@ type Product interface {
 	GetId() int
 	GeyName() string
 	GetPrice() float64
-	GetQuantity() int
+	GetStock() int
 }
 
 type BaseProduct struct {
 	Id        int
 	Name      string
 	Price     float64
-	Quantity  int
+	Stock     int
 	CreatedAt time.Time
 }
 
@@ -29,6 +29,6 @@ func (b *BaseProduct) GetPrice() float64 {
 	return b.Price
 }
 
-func (b *BaseProduct) GetQuantity() int {
-	return b.Quantity
+func (b *BaseProduct) GetStock() int {
+	return b.Stock
 }
