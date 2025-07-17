@@ -5,14 +5,14 @@ import (
 	"BookStore_API/internal/handler"
 	"BookStore_API/internal/repository"
 	"BookStore_API/internal/service"
-	"database/sql"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )
 
-func ApplicationRun(cfg *config.Config, logger *zap.Logger, db *sql.DB) {
-	repo := repository.NewRepository(db)
+func ApplicationRun(cfg *config.Config, logger *zap.Logger, db *pgxpool.Pool) {
+	repo := repository.NewRepository(db, logger)
 	services := service.NewService(repo)
 	handlers := handler.NewHandler(services, logger)
 

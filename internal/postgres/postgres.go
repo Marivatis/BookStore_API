@@ -2,31 +2,35 @@ package postgres
 
 import (
 	"BookStore_API/internal/config"
-	"database/sql"
+	"context"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 )
 
-func NewPostgresDB(cfg *config.DBConfig) (*sql.DB, error) {
+func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.Name, cfg.SSLMode,
 	)
 
-	db, err := sql.Open("postgres", connStr)
+	cfgPool, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	db.SetConnMaxLifetime(time.Hour)
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(25)
+	cfgPool.MaxConns = 25
+	cfgPool.MaxConnLifetime = time.Hour
 
-	err = db.Ping()
+	pool, err := pgxpool.NewWithConfig(ctx, cfgPool)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create pgx pool: %w", err)
 	}
 
-	return db, nil
+	if err = pool.Ping(ctx); err != nil {
+		pool.Close()
+		return nil, fmt.Errorf("failed to pong pgx pool: %w", err)
+	}
+
+	return pool, nil
 }

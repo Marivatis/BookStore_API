@@ -4,11 +4,13 @@ import (
 	"BookStore_API/internal/app"
 	"BookStore_API/internal/config"
 	"BookStore_API/internal/postgres"
+	"context"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -29,7 +31,10 @@ func main() {
 	logger.Info("Config successfully initialized:", zap.Any("cfg", cfg))
 
 	logger.Info("Initializing DB connection...")
-	db, err := postgres.NewPostgresDB(&cfg.DBCfg)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	db, err := postgres.NewPostgresDB(ctx, &cfg.DBCfg)
 	if err != nil {
 		logger.Fatal("Failed to initialize DB connection.", zap.Error(err))
 	}

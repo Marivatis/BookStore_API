@@ -3,10 +3,11 @@ package repository
 import (
 	"BookStore_API/internal/entity"
 	"context"
-	"database/sql"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
-type BookRepository interface {
+type Book interface {
 	Create(ctx context.Context, book entity.Book) (int, error)
 	GetByID(ctx context.Context, id int) (entity.Book, error)
 	GetAll(ctx context.Context) ([]entity.Book, error)
@@ -14,7 +15,7 @@ type BookRepository interface {
 	Delete(ctx context.Context, id int) error
 }
 
-type MagazineRepository interface {
+type Magazine interface {
 	Create(ctx context.Context, mag entity.Magazine) (int, error)
 	GetByID(ctx context.Context, id int) (entity.Magazine, error)
 	GetAll(ctx context.Context) ([]entity.Magazine, error)
@@ -22,7 +23,7 @@ type MagazineRepository interface {
 	Delete(ctx context.Context, id int) error
 }
 
-type OrderRepository interface {
+type Order interface {
 	Create(ctx context.Context, order entity.Order) (int, error)
 	GetByID(ctx context.Context, id int) (entity.Order, error)
 	GetAll(ctx context.Context) ([]entity.Order, error)
@@ -31,11 +32,13 @@ type OrderRepository interface {
 }
 
 type Repository struct {
-	BookRepository
-	MagazineRepository
-	OrderRepository
+	Book
+	Magazine
+	Order
 }
 
-func NewRepository(db *sql.DB) *Repository {
-	return &Repository{}
+func NewRepository(db *pgxpool.Pool, logger *zap.Logger) *Repository {
+	return &Repository{
+		Book: NewBookRepository(db, logger),
+	}
 }
