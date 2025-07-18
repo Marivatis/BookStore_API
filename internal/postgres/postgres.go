@@ -10,7 +10,7 @@ import (
 
 const (
 	InsertProductSQL = `INSERT INTO products (type, name, price, stock, created_at)
-						VALUES ($1, $2, $2, $4, $5)
+						VALUES ($1, $2, $3, $4, $5)
 						RETURNING id`
 )
 
