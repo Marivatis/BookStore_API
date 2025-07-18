@@ -13,7 +13,7 @@ import (
 
 func ApplicationRun(cfg *config.Config, logger *zap.Logger, db *pgxpool.Pool) {
 	repo := repository.NewRepository(db, logger)
-	services := service.NewService(repo)
+	services := service.NewService(repo, logger)
 	handlers := handler.NewHandler(services, logger)
 
 	runServer(handlers, cfg.Port, logger)
