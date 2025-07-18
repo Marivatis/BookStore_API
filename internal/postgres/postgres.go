@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+const (
+	InsertProductSQL = `INSERT INTO products (type, name, price, stock, created_at)
+						VALUES ($1, $2, $2, $4, $5)
+						RETURNING id`
+)
+
+const (
+	InsertBookSQL = `INSERT INTO books (product_id, author, isbn)
+					 VALUES ($1, $2, $3)`
+)
+
 func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
