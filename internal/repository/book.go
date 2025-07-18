@@ -3,6 +3,7 @@ package repository
 import (
 	"BookStore_API/internal/entity"
 	"BookStore_API/internal/postgres"
+	"BookStore_API/internal/zaplog"
 	"context"
 	"errors"
 	"fmt"
@@ -36,10 +37,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	}
 	defer r.finalizeTx(ctx, tx, &err)
 
-	r.logger.Debug("Starting book entity insert...",
-		zap.String("operation", "insert"),
-		zap.String("book_title", book.Name),
-	)
+	r.logDebugBookOperation("insert", book)
 
 	var id int
 
@@ -60,7 +58,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	}
 
 	r.logger.Info("Book inserted successfully",
-		zap.String("operation", "insert_book"),
+		zap.String("operation", "insert"),
 		zap.Int("id", id),
 		zap.Duration("duration", time.Since(start)),
 	)
@@ -110,4 +108,12 @@ func (r *BookRepository) handleDBError(err error, operation string, start time.T
 		zap.Error(err),
 	)
 	return fmt.Errorf("%s: failed: %w", operation, err)
+}
+
+func (r *BookRepository) logDebugBookOperation(operation string, book entity.Book) {
+	fields := append(
+		[]zap.Field{zap.String("operation", operation)},
+		zaplog.BookFields(book)...,
+	)
+	r.logger.Debug("Starting repository book operation...", fields...)
 }
