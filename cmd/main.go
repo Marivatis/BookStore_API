@@ -4,10 +4,10 @@ import (
 	"BookStore_API/internal/app"
 	"BookStore_API/internal/config"
 	"BookStore_API/internal/postgres"
+	"BookStore_API/internal/zaplog"
 	"context"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"log"
 	"os"
 	"time"
@@ -23,7 +23,7 @@ func main() {
 		appEnv = "development"
 	}
 
-	logger := initLogger(appEnv)
+	logger := zaplog.InitLogger(appEnv)
 	logger.Info("Logger successfully initialized.")
 
 	logger.Info("Initializing config...")
@@ -47,36 +47,4 @@ func main() {
 	logger.Info("Running application...")
 	app.ApplicationRun(cfg, logger, db)
 	logger.Info("Application closed.")
-}
-
-func initLogger(appEnv string) *zap.Logger {
-	var cfg zap.Config
-
-	if appEnv == "production" {
-		cfg = zap.NewProductionConfig()
-		cfg.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
-	} else {
-		cfg = zap.NewDevelopmentConfig()
-		cfg.Encoding = "console"
-		cfg.EncoderConfig.EncodeLevel = zapcore.LowercaseColorLevelEncoder
-	}
-
-	cfg.EncoderConfig.TimeKey = "time"
-	cfg.EncoderConfig.LevelKey = "level"
-	cfg.EncoderConfig.MessageKey = "message"
-	cfg.EncoderConfig.CallerKey = "caller"
-	cfg.EncoderConfig.StacktraceKey = "stacktrace"
-	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	cfg.InitialFields = map[string]interface{}{
-		"service": "bookstore-api",
-		"app_env": appEnv,
-	}
-
-	logger, err := cfg.Build()
-	if err != nil {
-		log.Fatal("Failed to initialize logger: ", err)
-	}
-
-	return logger
 }
