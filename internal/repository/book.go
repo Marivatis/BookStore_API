@@ -67,7 +67,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	return id, nil
 }
 
-func (r *BookRepository) GetByID(ctx context.Context, id int) (entity.Book, error) {
+func (r *BookRepository) GetById(ctx context.Context, id int) (entity.Book, error) {
 	return entity.Book{}, nil
 }
 func (r *BookRepository) GetAll(ctx context.Context) ([]entity.Book, error) {
