@@ -19,5 +19,5 @@ func NewHandler(s *service.Service, logger *zap.Logger) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(e *echo.Echo) {
-
+	e.POST("/books", h.createBook)
 }
