@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
@@ -19,7 +20,11 @@ type DBConfig struct {
 	SSLMode  string `env:"DB_SSLMODE" env-default:"disable"`
 }
 
-func InitConfig(logger *zap.Logger) *Config {
+func InitConfig(logger *zap.Logger, appEnv string) *Config {
+	if appEnv == "development" {
+		loadEnvVars(logger)
+	}
+
 	var cfg Config
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
@@ -27,4 +32,12 @@ func InitConfig(logger *zap.Logger) *Config {
 	}
 
 	return &cfg
+}
+
+func loadEnvVars(logger *zap.Logger) {
+	if err := godotenv.Load(".env.local"); err != nil {
+		logger.Info("No .env.local file found, relying on system environment variables.")
+	} else {
+		logger.Info(".env.local file loaded")
+	}
 }

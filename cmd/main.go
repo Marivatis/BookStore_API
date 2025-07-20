@@ -6,18 +6,12 @@ import (
 	"BookStore_API/internal/postgres"
 	"BookStore_API/internal/zaplog"
 	"context"
-	"github.com/joho/godotenv"
 	"go.uber.org/zap"
-	"log"
 	"os"
 	"time"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, relying on system environment variables.")
-	}
-
 	appEnv := os.Getenv("APP_ENV")
 	if appEnv == "" {
 		appEnv = "development"
@@ -27,7 +21,7 @@ func main() {
 	logger.Info("Logger successfully initialized.")
 
 	logger.Info("Initializing config...")
-	cfg := config.InitConfig(logger)
+	cfg := config.InitConfig(logger, appEnv)
 	logger.Info("Config successfully initialized:", zap.Any("cfg", cfg))
 
 	logger.Info("Initializing DB connection...")
