@@ -1,0 +1,28 @@
+# Exclude locally vendored dependencies.
+vendor/
+
+# Exclude git history and configuration.
+.gitignore
+.git
+
+# Docker
+docker-compose.yml
+Dockerfile
+
+# IDE/editor
+.idea/
+.vscode/
+
+# Exclude documents
+NOTICE
+README.md
+LICENSE
+AUTHORS.md
+CONTRIBUTING.md
+
+# Env files
+.env
+.env.local
+
+# Logs
+*.log
