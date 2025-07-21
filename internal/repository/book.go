@@ -42,7 +42,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	var id int
 
 	// product insert, returning 'id'
-	err = tx.QueryRow(ctx, postgres.InsertProductSQL,
+	err = tx.QueryRow(ctx, postgres.InsertProductsSQL,
 		"book", book.Name, book.Price, book.Stock, start,
 	).Scan(&id)
 	if err != nil {
@@ -50,7 +50,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	}
 
 	// book insert
-	_, err = tx.Exec(ctx, postgres.InsertBookSQL,
+	_, err = tx.Exec(ctx, postgres.InsertBooksSQL,
 		id, book.Author, book.Isbn,
 	)
 	if err != nil {

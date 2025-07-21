@@ -8,15 +8,42 @@ import (
 	"time"
 )
 
+// products table sql queries
 const (
-	InsertProductSQL = `INSERT INTO products (type, name, price, stock, created_at)
-						VALUES ($1, $2, $3, $4, $5)
-						RETURNING id`
+	InsertProductsSQL = `INSERT INTO products (type, name, price, stock, created_at)
+						 VALUES ($1, $2, $3, $4, $5)
+						 RETURNING id`
+	GetByIdProductsSQL = `SELECT id, type, name, price, stock, created_at
+						  FROM products
+						  WHERE id = $1`
+	GetAllProductsSQL = `SELECT id, type, name, price, stock, created_at
+						 FROM products
+						 ORDER BY id`
+	UpdateProductsSQL = `UPDATE products
+						 SET name = $2,
+						 	 price = $3,
+						 	 stock = $4
+						 WHERE id = $1`
+	DeleteByIdProductsSQL = `DELETE FROM products
+							 WHERE id = $1`
 )
 
+// books table sql queries
 const (
-	InsertBookSQL = `INSERT INTO books (product_id, author, isbn)
-					 VALUES ($1, $2, $3)`
+	InsertBooksSQL = `INSERT INTO books (product_id, author, isbn)
+					  VALUES ($1, $2, $3)`
+	GetByIdBooksSQL = `SELECT product_id, author, isbn
+					   FROM books
+					   WHERE product_id = $1`
+	GetAllBooksSQL = `SELECT product_id, author, isbn
+					  FROM books
+					  ORDER BY product_id`
+	UpdateBooksSQL = `UPDATE books
+					  SET author = $2,
+					      isbn = $3
+					  WHERE product_id = $1`
+	DeleteByIdBooksSQL = `DELETE FROM books
+				  		  WHERE product_id = $1`
 )
 
 func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
