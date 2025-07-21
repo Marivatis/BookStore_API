@@ -25,9 +25,6 @@ func (s *BookService) Create(ctx context.Context, book entity.Book) (int, error)
 func (s *BookService) GetById(ctx context.Context, id int) (entity.Book, error) {
 	return s.repo.Book.GetById(ctx, id)
 }
-func (s *BookService) GetAll(ctx context.Context) ([]entity.Book, error) {
-	return s.repo.Book.GetAll(ctx)
-}
 func (s *BookService) Update(ctx context.Context, book entity.Book) error {
 	return s.repo.Book.Update(ctx, book)
 }
