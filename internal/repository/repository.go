@@ -3,8 +3,14 @@ package repository
 import (
 	"BookStore_API/internal/entity"
 	"context"
+	"errors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
+)
+
+var (
+	ErrInvalidProductType = errors.New("invalid product type")
+	ErrDBOperation        = errors.New("database operation failed")
 )
 
 type Book interface {
