@@ -16,9 +16,6 @@ const (
 	GetByIdProductsSQL = `SELECT id, type, name, price, stock, created_at
 						  FROM products
 						  WHERE id = $1`
-	GetAllProductsSQL = `SELECT id, type, name, price, stock, created_at
-						 FROM products
-						 ORDER BY id`
 	UpdateProductsSQL = `UPDATE products
 						 SET name = $2,
 						 	 price = $3,
@@ -35,9 +32,6 @@ const (
 	GetByIdBooksSQL = `SELECT product_id, author, isbn
 					   FROM books
 					   WHERE product_id = $1`
-	GetAllBooksSQL = `SELECT product_id, author, isbn
-					  FROM books
-					  ORDER BY product_id`
 	UpdateBooksSQL = `UPDATE books
 					  SET author = $2,
 					      isbn = $3
