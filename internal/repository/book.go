@@ -108,9 +108,6 @@ func (r *BookRepository) GetById(ctx context.Context, id int) (entity.Book, erro
 	r.logInfoBookOperation("get_by_id", start, book)
 	return book, nil
 }
-func (r *BookRepository) GetAll(ctx context.Context) ([]entity.Book, error) {
-	return []entity.Book{}, nil
-}
 func (r *BookRepository) Update(ctx context.Context, book entity.Book) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
