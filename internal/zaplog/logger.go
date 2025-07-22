@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-func InitLogger(appEnv string) *zap.Logger {
+func InitLogger(appEnv string, logFormat string) *zap.Logger {
 	var cfg zap.Config
 
-	if appEnv == "production" {
+	if appEnv == "production" && logFormat != "console" {
 		cfg = zap.NewProductionConfig()
 		cfg.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
 	} else {
@@ -19,8 +19,8 @@ func InitLogger(appEnv string) *zap.Logger {
 	}
 
 	cfg.EncoderConfig.TimeKey = "time"
-	cfg.EncoderConfig.LevelKey = "level"
 	cfg.EncoderConfig.MessageKey = "message"
+	cfg.EncoderConfig.LevelKey = "level"
 	cfg.EncoderConfig.CallerKey = "caller"
 	cfg.EncoderConfig.StacktraceKey = "stacktrace"
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder

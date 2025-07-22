@@ -16,8 +16,12 @@ func main() {
 	if appEnv == "" {
 		appEnv = "development"
 	}
+	logFormat := os.Getenv("LOG_FORMAT")
+	if logFormat == "" {
+		logFormat = "json"
+	}
 
-	logger := zaplog.InitLogger(appEnv)
+	logger := zaplog.InitLogger(appEnv, logFormat)
 	logger.Info("Logger successfully initialized.")
 
 	logger.Info("Initializing config...")
