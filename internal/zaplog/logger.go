@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-func InitLogger(appEnv string) *zap.Logger {
+func InitLogger(appEnv string, logFormat string) *zap.Logger {
 	var cfg zap.Config
 
-	if appEnv == "production" {
+	if appEnv == "production" && logFormat != "console" {
 		cfg = zap.NewProductionConfig()
 		cfg.EncoderConfig.EncodeLevel = zapcore.LowercaseLevelEncoder
 	} else {

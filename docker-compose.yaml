@@ -26,6 +26,7 @@ services:
     environment:
       APP_ENV: production
       PORT: ${PORT}
+      LOG_FORMAT: ${LOG_FORMAT}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
