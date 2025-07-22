@@ -2,14 +2,17 @@ package dto
 
 import (
 	"BookStore_API/internal/entity"
+	"github.com/go-playground/validator/v10"
 	"time"
 )
 
+var validate = validator.New()
+
 type BookCreateRequest struct {
-	Name   string  `json:"name"`
+	Name   string  `json:"name" validator:"required"`
 	Price  float64 `json:"price"`
-	Author string  `json:"author"`
-	Isbn   string  `json:"isbn"`
+	Author string  `json:"author" validator:"required"`
+	Isbn   string  `json:"isbn" validator:"required, len=14"`
 }
 
 type BookUpdateRequest struct {
@@ -26,6 +29,10 @@ type BookResponse struct {
 	Author    string    `json:"author"`
 	Isbn      string    `json:"isbn"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+func (r *BookCreateRequest) Validate() error {
+	return validate.Struct(r)
 }
 
 func FromEntityBook(b entity.Book) BookResponse {
