@@ -1,15 +1,15 @@
 services:
   db:
-    image: postgres:15
     container_name: bookstore_db
+    image: postgres:15
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "${DB_PORT}:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 5s
@@ -17,10 +17,10 @@ services:
       retries: 5
 
   app:
+    container_name: bookstore_app
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: bookstore_app
     ports:
       - "${PORT}:8080"
     environment:
@@ -35,6 +35,10 @@ services:
       DB_URL: ${DB_URL}
     depends_on:
       - db
-
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 volumes:
   db_data:
