@@ -1,6 +1,6 @@
 FROM golang:1.24-alpine AS build
 
-RUN apk add --no-cache git ca-certificates tzdata postgresql-client bash curl
+RUN apk add --no-cache git ca-certificates tzdata postgresql-client curl
 
 RUN adduser -D -s /bin/sh -u 1001 appuser
 
@@ -24,7 +24,7 @@ RUN wget -O migrate.tar.gz https://github.com/golang-migrate/migrate/releases/do
 
 FROM alpine
 
-RUN apk add --no-cache ca-certificates tzdata postgresql-client bash curl
+RUN apk add --no-cache ca-certificates tzdata postgresql-client curl
 
 WORKDIR /app
 
