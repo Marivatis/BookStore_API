@@ -7,6 +7,16 @@ import (
 	"net/http"
 )
 
+type ErrBindResponse struct {
+	Message string `json:"message"`
+}
+type ErrValidationResponse struct {
+	Message string `json:"message"`
+}
+type ErrCreateResponse struct {
+	Message string `json:"message"`
+}
+
 type Handler struct {
 	services *service.Service
 	logger   *zap.Logger
@@ -35,4 +45,11 @@ func (h *Handler) registerBookRoutes(e *echo.Echo) {
 
 func (h *Handler) serverPing(c echo.Context) error {
 	return c.String(http.StatusOK, "pong")
+}
+
+func (h *Handler) logRequestStart(c echo.Context, msg string) {
+	h.logger.Info(msg,
+		zap.String("method", c.Request().Method),
+		zap.String("path", c.Request().URL.Path),
+	)
 }

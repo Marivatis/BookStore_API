@@ -1,11 +1,65 @@
 package handler
 
 import (
+	"BookStore_API/internal/dto"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
+	"net/http"
+	"time"
 )
 
+type CreateBookResponse struct {
+	Id      int    `json:"id"`
+	Message string `json:"message"`
+}
+
 func (h *Handler) createBook(c echo.Context) error {
-	return nil
+	start := time.Now()
+
+	h.logRequestStart(c, "Create book request started")
+
+	var req dto.BookCreateRequest
+
+	// request binding
+	if err := c.Bind(&req); err != nil {
+		h.logger.Error("failed to bind request",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusBadRequest, ErrBindResponse{
+			Message: "invalid request body",
+		})
+	}
+
+	// request validation
+	if err := req.Validate(); err != nil {
+		h.logger.Error("validation failed",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusBadRequest, ErrValidationResponse{
+			Message: err.Error(),
+		})
+	}
+
+	book := req.ToEntity()
+
+	// create book service
+	id, err := h.services.Book.Create(c.Request().Context(), book)
+	if err != nil {
+		h.logger.Error("failed to create book",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusInternalServerError, ErrCreateResponse{
+			Message: "internal server error",
+		})
+	}
+
+	return c.JSON(http.StatusCreated, CreateBookResponse{
+		Id:      id,
+		Message: "book created",
+	})
 }
 func (h *Handler) getByIdBook(c echo.Context) error {
 	return nil
