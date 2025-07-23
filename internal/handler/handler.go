@@ -5,15 +5,24 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type ErrBindResponse struct {
 	Message string `json:"message"`
 }
+type ErrParamResponse struct {
+	Message string `json:"message"`
+}
 type ErrValidationResponse struct {
 	Message string `json:"message"`
 }
+
 type ErrCreateResponse struct {
+	Message string `json:"message"`
+}
+type ErrGetByIdResponse struct {
 	Message string `json:"message"`
 }
 
@@ -45,6 +54,20 @@ func (h *Handler) registerBookRoutes(e *echo.Echo) {
 
 func (h *Handler) serverPing(c echo.Context) error {
 	return c.String(http.StatusOK, "pong")
+}
+
+func (h *Handler) parseIdParam(c echo.Context, start time.Time) (int, error) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		h.logger.Error("failed to get param",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return 0, echo.NewHTTPError(http.StatusBadRequest, ErrParamResponse{
+			Message: "invalid id format",
+		})
+	}
+	return id, nil
 }
 
 func (h *Handler) logRequestStart(c echo.Context, msg string) {

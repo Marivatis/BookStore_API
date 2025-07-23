@@ -12,6 +12,10 @@ type CreateBookResponse struct {
 	Id      int    `json:"id"`
 	Message string `json:"message"`
 }
+type GetByIdBookResponse struct {
+	Book    dto.BookResponse `json:"book"`
+	Message string           `json:"message"`
+}
 
 func (h *Handler) createBook(c echo.Context) error {
 	start := time.Now()
@@ -62,7 +66,34 @@ func (h *Handler) createBook(c echo.Context) error {
 	})
 }
 func (h *Handler) getByIdBook(c echo.Context) error {
-	return nil
+	start := time.Now()
+
+	h.logRequestStart(c, "Get by id book request started")
+
+	// get id param
+	id, err := h.parseIdParam(c, start)
+	if err != nil {
+		return err
+	}
+
+	// get by id book service
+	book, err := h.services.Book.GetById(c.Request().Context(), id)
+	if err != nil {
+		h.logger.Error("failed to get by id book",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusInternalServerError, ErrGetByIdResponse{
+			Message: "internal server error",
+		})
+	}
+
+	resp := dto.FromEntityBook(book)
+
+	return c.JSON(http.StatusOK, GetByIdBookResponse{
+		Book:    resp,
+		Message: "here is your book",
+	})
 }
 func (h *Handler) updateBook(c echo.Context) error {
 	return nil
