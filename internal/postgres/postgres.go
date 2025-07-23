@@ -29,7 +29,7 @@ const (
 const (
 	InsertBooksSQL = `INSERT INTO books (product_id, author, isbn)
 					  VALUES ($1, $2, $3)`
-	GetByIdBooksSQL = `SELECT product_id, author, isbn
+	GetByIdBooksSQL = `SELECT author, isbn
 					   FROM books
 					   WHERE product_id = $1`
 	UpdateBooksSQL = `UPDATE books
