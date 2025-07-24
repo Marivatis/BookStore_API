@@ -18,6 +18,7 @@ type Book interface {
 	GetById(ctx context.Context, id int) (entity.Book, error)
 	Update(ctx context.Context, book entity.Book) error
 	Delete(ctx context.Context, id int) error
+	IsbnExists(ctx context.Context, isbn string) (bool, error)
 }
 
 type Magazine interface {

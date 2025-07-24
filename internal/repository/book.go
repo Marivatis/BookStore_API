@@ -204,6 +204,34 @@ func (r *BookRepository) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
+func (r *BookRepository) IsbnExists(ctx context.Context, isbn string) (bool, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	start := time.Now()
+
+	r.logger.Debug("Starting repository book operation...",
+		zap.String("operation", "exists_isbn"),
+		zap.String("isbn", isbn),
+	)
+
+	var exists bool
+
+	// check isbn existence
+	err := r.db.QueryRow(ctx, postgres.ExistsIsbnBooksSQL, isbn).
+		Scan(&exists)
+	if err != nil {
+		return false, r.handleDBError(err, "exists_isbn", start, "failed to check isbn existence")
+	}
+
+	r.logger.Info("Finished repository book operation",
+		zap.String("operation", "exists_isbn"),
+		zap.String("isbn", isbn),
+		zap.Duration("duration", time.Since(start)),
+	)
+	return exists, nil
+}
+
 func (r *BookRepository) finalizeTx(ctx context.Context, tx pgx.Tx, err *error) {
 	if *err != nil {
 		if rollErr := tx.Rollback(ctx); rollErr != nil {

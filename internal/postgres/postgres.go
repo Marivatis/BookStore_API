@@ -38,6 +38,12 @@ const (
 					  WHERE product_id = $1`
 	DeleteByIdBooksSQL = `DELETE FROM books
 				  		  WHERE product_id = $1`
+	ExistsIsbnBooksSQL = `SELECT EXISTS (
+							  SELECT 1
+							  FROM books
+							  WHERE isbn = $1
+							  LIMIT 1
+						  )`
 )
 
 func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
