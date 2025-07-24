@@ -46,6 +46,27 @@ const (
 						  )`
 )
 
+// magazines table sql queries
+const (
+	InsertMagazinesSQL = `INSERT INTO magazines (product_id, issue_number, publication_date)
+						  VALUES ($1, $2, $3)`
+	GetByIdMagazinesSQL = `SELECT issue_number, publication_date
+						   FROM magazines
+						   WHERE product_id = $1`
+	UpdateMagazinesSQL = `UPDATE magazines
+						  SET issue_number = $2,
+						  	  publication_date = $3
+						  WHERE product_id = $1`
+	DeleteByIdMagazinesSQL = `DELETE FROM magazines
+							  WHERE product_id = $1`
+	ExistsIssueNumberMagazinesSQL = `SELECT EXISTS (
+										 SELECT 1
+										 FROM magazines
+										 WHERE issue_number = $1
+										 LIMIT 1
+								     )`
+)
+
 func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
