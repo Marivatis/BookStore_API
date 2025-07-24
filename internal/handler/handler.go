@@ -28,6 +28,9 @@ type ErrGetByIdResponse struct {
 type ErrUpdateResponse struct {
 	Message string `json:"message"`
 }
+type ErrDeleteByIdResponse struct {
+	Message string `json:"message"`
+}
 
 type Handler struct {
 	services *service.Service

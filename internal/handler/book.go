@@ -19,6 +19,9 @@ type GetByIdBookResponse struct {
 type UpdateBookResponse struct {
 	Message string `json:"message"`
 }
+type DeleteBookResponse struct {
+	Message string `json:"message"`
+}
 
 func (h *Handler) createBook(c echo.Context) error {
 	start := time.Now()
@@ -164,5 +167,29 @@ func (h *Handler) updateBook(c echo.Context) error {
 	})
 }
 func (h *Handler) deleteBook(c echo.Context) error {
-	return nil
+	start := time.Now()
+
+	h.logRequestStart(c, "Update book request started")
+
+	// get id param
+	id, err := h.parseIdParam(c, start)
+	if err != nil {
+		return err
+	}
+
+	// delete book service
+	err = h.services.Book.Delete(c.Request().Context(), id)
+	if err != nil {
+		h.logger.Error("failed to delete by id book",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusInternalServerError, ErrDeleteByIdResponse{
+			Message: "internal server error",
+		})
+	}
+
+	return c.JSON(http.StatusOK, DeleteBookResponse{
+		Message: "book successfully deleted",
+	})
 }
