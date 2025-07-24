@@ -2,7 +2,6 @@ package handler
 
 import (
 	"BookStore_API/internal/dto"
-	"BookStore_API/internal/entity"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"net/http"
@@ -134,9 +133,19 @@ func (h *Handler) updateBook(c echo.Context) error {
 		})
 	}
 
-	var book entity.Book
+	// get by id book service
+	book, err := h.services.Book.GetById(c.Request().Context(), id)
+	if err != nil {
+		h.logger.Error("failed to get by id book",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusInternalServerError, ErrGetByIdResponse{
+			Message: "internal server error",
+		})
+	}
+
 	req.ApplyToEntity(&book)
-	book.Id = id
 
 	// update book service
 	err = h.services.Book.Update(c.Request().Context(), book)
