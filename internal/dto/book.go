@@ -9,17 +9,17 @@ import (
 var validate = validator.New()
 
 type BookCreateRequest struct {
-	Name   string  `json:"name" validator:"required"`
+	Name   string  `json:"name" validate:"required"`
 	Price  float64 `json:"price"`
-	Author string  `json:"author" validator:"required"`
-	Isbn   string  `json:"isbn" validator:"required, len=14"`
+	Author string  `json:"author" validate:"required"`
+	Isbn   string  `json:"isbn" validate:"required,len=14"`
 }
 
 type BookUpdateRequest struct {
 	Name   *string  `json:"name"`
 	Price  *float64 `json:"price"`
 	Author *string  `json:"author"`
-	Isbn   *string  `json:"isbn"`
+	Isbn   *string  `json:"isbn" validate:"len=14"`
 }
 
 type BookResponse struct {
@@ -32,6 +32,10 @@ type BookResponse struct {
 }
 
 func (r *BookCreateRequest) Validate() error {
+	return validate.Struct(r)
+}
+
+func (r *BookUpdateRequest) Validate() error {
 	return validate.Struct(r)
 }
 
