@@ -5,9 +5,7 @@ import (
 	"BookStore_API/internal/postgres"
 	"BookStore_API/internal/zaplog"
 	"context"
-	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 	"time"
@@ -36,7 +34,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 	if err != nil {
 		return 0, fmt.Errorf("failed to begin tx: %w", err)
 	}
-	defer r.finalizeTx(ctx, tx, &err)
+	defer finalizeTx(r.logger, ctx, tx, &err)
 
 	r.logDebugBookOperation("insert", book)
 
@@ -47,7 +45,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 		"book", book.Name, book.Price, book.Stock, start,
 	).Scan(&id)
 	if err != nil {
-		return 0, r.handleDBError(err, "insert_product", start, "failed to insert product")
+		return 0, handleDBError(r.logger, err, "insert_product", start, "failed to insert product")
 	}
 
 	// book insert
@@ -55,7 +53,7 @@ func (r *BookRepository) Create(ctx context.Context, book entity.Book) (int, err
 		id, book.Author, book.Isbn,
 	)
 	if err != nil {
-		return 0, r.handleDBError(err, "insert_book", start, "failed to insert book")
+		return 0, handleDBError(r.logger, err, "insert_book", start, "failed to insert book")
 	}
 
 	r.logger.Info("Book inserted successfully",
@@ -76,7 +74,7 @@ func (r *BookRepository) GetById(ctx context.Context, id int) (entity.Book, erro
 	if err != nil {
 		return entity.Book{}, fmt.Errorf("failed to begin tx: %w", err)
 	}
-	defer r.finalizeTx(ctx, tx, &err)
+	defer finalizeTx(r.logger, ctx, tx, &err)
 
 	r.logger.Debug("Starting repository book operation...",
 		zap.String("operation", "get_by_id"),
@@ -90,7 +88,7 @@ func (r *BookRepository) GetById(ctx context.Context, id int) (entity.Book, erro
 	err = tx.QueryRow(ctx, postgres.GetByIdProductsSQL, id).
 		Scan(&book.Id, &productType, &book.Name, &book.Price, &book.Stock, &book.CreatedAt)
 	if err != nil {
-		return entity.Book{}, r.handleDBError(err, "get_by_id_product", start, "failed to get product by id")
+		return entity.Book{}, handleDBError(r.logger, err, "get_by_id_product", start, "failed to get product by id")
 	}
 
 	// product type check
@@ -102,7 +100,7 @@ func (r *BookRepository) GetById(ctx context.Context, id int) (entity.Book, erro
 	err = tx.QueryRow(ctx, postgres.GetByIdBooksSQL, id).
 		Scan(&book.Author, &book.Isbn)
 	if err != nil {
-		return entity.Book{}, r.handleDBError(err, "get_by_id_book", start, "failed to get book by id")
+		return entity.Book{}, handleDBError(r.logger, err, "get_by_id_book", start, "failed to get book by id")
 	}
 
 	r.logInfoBookOperation("get_by_id", start, book)
@@ -119,14 +117,14 @@ func (r *BookRepository) Update(ctx context.Context, book entity.Book) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
 	}
-	defer r.finalizeTx(ctx, tx, &err)
+	defer finalizeTx(r.logger, ctx, tx, &err)
 
 	r.logDebugBookOperation("update", book)
 
 	// product update by id
 	tag, err := tx.Exec(ctx, postgres.UpdateProductsSQL, book.Id, book.Name, book.Price, book.Stock)
 	if err != nil {
-		return r.handleDBError(err, "update_product", start, "failed to update product by id")
+		return handleDBError(r.logger, err, "update_product", start, "failed to update product by id")
 	}
 
 	// product update result check
@@ -139,7 +137,7 @@ func (r *BookRepository) Update(ctx context.Context, book entity.Book) error {
 	// book update by id
 	tag, err = tx.Exec(ctx, postgres.UpdateBooksSQL, book.Id, book.Author, book.Isbn)
 	if err != nil {
-		return r.handleDBError(err, "update_book", start, "failed to update book by id")
+		return handleDBError(r.logger, err, "update_book", start, "failed to update book by id")
 	}
 
 	// book update result check
@@ -163,7 +161,7 @@ func (r *BookRepository) Delete(ctx context.Context, id int) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin tx: %w", err)
 	}
-	defer r.finalizeTx(ctx, tx, &err)
+	defer finalizeTx(r.logger, ctx, tx, &err)
 
 	r.logger.Debug("Starting repository book operation...",
 		zap.String("operation", "delete_by_id"),
@@ -173,7 +171,7 @@ func (r *BookRepository) Delete(ctx context.Context, id int) error {
 	// delete book by id
 	tag, err := tx.Exec(ctx, postgres.DeleteByIdBooksSQL, id)
 	if err != nil {
-		return r.handleDBError(err, "delete_book", start, "failed to delete book by id")
+		return handleDBError(r.logger, err, "delete_book", start, "failed to delete book by id")
 	}
 
 	// book delete result check
@@ -186,7 +184,7 @@ func (r *BookRepository) Delete(ctx context.Context, id int) error {
 	// delete product by id
 	tag, err = tx.Exec(ctx, postgres.DeleteByIdProductsSQL, id)
 	if err != nil {
-		return r.handleDBError(err, "delete_product", start, "failed to delete product by id")
+		return handleDBError(r.logger, err, "delete_product", start, "failed to delete product by id")
 	}
 
 	// product delete result check
@@ -221,7 +219,7 @@ func (r *BookRepository) IsbnExists(ctx context.Context, isbn string) (bool, err
 	err := r.db.QueryRow(ctx, postgres.ExistsIsbnBooksSQL, isbn).
 		Scan(&exists)
 	if err != nil {
-		return false, r.handleDBError(err, "exists_isbn", start, "failed to check isbn existence")
+		return false, handleDBError(r.logger, err, "exists_isbn", start, "failed to check isbn existence")
 	}
 
 	r.logger.Info("Finished repository book operation",
@@ -230,38 +228,6 @@ func (r *BookRepository) IsbnExists(ctx context.Context, isbn string) (bool, err
 		zap.Duration("duration", time.Since(start)),
 	)
 	return exists, nil
-}
-
-func (r *BookRepository) finalizeTx(ctx context.Context, tx pgx.Tx, err *error) {
-	if *err != nil {
-		if rollErr := tx.Rollback(ctx); rollErr != nil {
-			r.logger.Error("rollback failed", zap.Error(rollErr))
-		}
-		return
-	}
-	if commitErr := tx.Commit(ctx); commitErr != nil {
-		r.logger.Error("commit failed", zap.Error(commitErr))
-		*err = commitErr
-	}
-}
-
-func (r *BookRepository) handleDBError(err error, operation string, start time.Time, msg string) error {
-	if errors.Is(err, context.DeadlineExceeded) {
-		r.logger.Error(msg,
-			zap.String("operation", operation),
-			zap.Duration("elapsed", time.Since(start)),
-			zap.String("reason", "timeout"),
-			zap.Error(err),
-		)
-		return fmt.Errorf("%w(%s): timeout: %w", ErrDBOperation, operation, err)
-	}
-
-	r.logger.Error(msg,
-		zap.String("operation", operation),
-		zap.Duration("elapsed", time.Since(start)),
-		zap.Error(err),
-	)
-	return fmt.Errorf("%w(%s): failed: %w", ErrDBOperation, operation, err)
 }
 
 func (r *BookRepository) logDebugBookOperation(operation string, book entity.Book) {
