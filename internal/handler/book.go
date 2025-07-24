@@ -2,6 +2,7 @@ package handler
 
 import (
 	"BookStore_API/internal/dto"
+	"BookStore_API/internal/entity"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"net/http"
@@ -15,6 +16,9 @@ type CreateBookResponse struct {
 type GetByIdBookResponse struct {
 	Book    dto.BookResponse `json:"book"`
 	Message string           `json:"message"`
+}
+type UpdateBookResponse struct {
+	Message string `json:"message"`
 }
 
 func (h *Handler) createBook(c echo.Context) error {
@@ -96,7 +100,59 @@ func (h *Handler) getByIdBook(c echo.Context) error {
 	})
 }
 func (h *Handler) updateBook(c echo.Context) error {
-	return nil
+	start := time.Now()
+
+	h.logRequestStart(c, "Update book request started")
+
+	// get id param
+	id, err := h.parseIdParam(c, start)
+	if err != nil {
+		return err
+	}
+
+	var req dto.BookUpdateRequest
+
+	// request binding
+	if err = c.Bind(&req); err != nil {
+		h.logger.Error("failed to bind request",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusBadRequest, ErrBindResponse{
+			Message: "invalid request body",
+		})
+	}
+
+	// request validation
+	if err = req.Validate(); err != nil {
+		h.logger.Error("validation failed",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusBadRequest, ErrValidationResponse{
+			Message: err.Error(),
+		})
+	}
+
+	var book entity.Book
+	req.ApplyToEntity(&book)
+	book.Id = id
+
+	// update book service
+	err = h.services.Book.Update(c.Request().Context(), book)
+	if err != nil {
+		h.logger.Error("failed to update book",
+			zap.Error(err),
+			zap.Duration("duration", time.Since(start)),
+		)
+		return c.JSON(http.StatusInternalServerError, ErrUpdateResponse{
+			Message: "internal server error",
+		})
+	}
+
+	return c.JSON(http.StatusOK, UpdateBookResponse{
+		Message: "book successfully updated",
+	})
 }
 func (h *Handler) deleteBook(c echo.Context) error {
 	return nil
