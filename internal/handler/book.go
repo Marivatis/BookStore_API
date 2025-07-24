@@ -169,7 +169,7 @@ func (h *Handler) updateBook(c echo.Context) error {
 func (h *Handler) deleteBook(c echo.Context) error {
 	start := time.Now()
 
-	h.logRequestStart(c, "Update book request started")
+	h.logRequestStart(c, "Delete book request started")
 
 	// get id param
 	id, err := h.parseIdParam(c, start)
