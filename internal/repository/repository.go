@@ -29,6 +29,7 @@ type Magazine interface {
 	GetById(ctx context.Context, id int) (entity.Magazine, error)
 	Update(ctx context.Context, mag entity.Magazine) error
 	Delete(ctx context.Context, id int) error
+	ExistsIssueNumber(ctx context.Context, issueNumber int) (bool, error)
 }
 
 type Order interface {
