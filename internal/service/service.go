@@ -36,6 +36,7 @@ type Service struct {
 
 func NewService(r *repository.Repository, logger *zap.Logger) *Service {
 	return &Service{
-		Book: NewBookService(r, logger),
+		Book:     NewBookService(r, logger),
+		Magazine: NewMagazineService(r, logger),
 	}
 }
