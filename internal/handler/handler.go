@@ -48,6 +48,7 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/ping", h.serverPing)
 
 	h.registerBookRoutes(e)
+	h.registerMagazineRoutes(e)
 }
 
 func (h *Handler) registerBookRoutes(e *echo.Echo) {
@@ -56,6 +57,13 @@ func (h *Handler) registerBookRoutes(e *echo.Echo) {
 	notes.GET("/:id", h.getByIdBook)
 	notes.PUT("/:id", h.updateBook)
 	notes.DELETE("/:id", h.deleteBook)
+}
+func (h *Handler) registerMagazineRoutes(e *echo.Echo) {
+	magz := e.Group("/magazines")
+	magz.POST("", h.createMagazine)
+	magz.GET("/:id", h.getByIdMagazine)
+	magz.PUT("/:id", h.updateMagazine)
+	magz.DELETE("/:id", h.deleteMagazine)
 }
 
 func (h *Handler) serverPing(c echo.Context) error {
