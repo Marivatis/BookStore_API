@@ -4,7 +4,7 @@ import "time"
 
 type Product interface {
 	GetId() int
-	GeyName() string
+	GetName() string
 	GetPrice() float64
 	GetStock() int
 }
