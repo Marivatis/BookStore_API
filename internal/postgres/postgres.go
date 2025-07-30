@@ -67,6 +67,37 @@ const (
 								     )`
 )
 
+const (
+	InsertOrdersSQL = `INSERT INTO orders (status, created_at)
+				 	   VALUES ($1, $2)
+				 	   RETURNING id`
+	GetByIdOrdersSQL = `SELECT status, created_at
+						FROM orders
+						WHERE id = $1`
+	UpdateOrdersSQL = `UPDATE orders
+					   SET status = $2
+					   WHERE id = $1`
+	DeleteByIdOrdersSQL = `DELETE FROM orders
+						   WHERE id = $1`
+)
+
+const (
+	InsertOrderItemsSQL = `INSERT INTO order_items (order_id, product_id, quantity, price)
+						   VALUES ($1, $2, $3, $4)`
+
+	GetByOrderIdOrderItemsSQL = `SELECT product_id, quantity, price
+								 FROM order_items
+								 WHERE order_id = $1`
+	UpsertOrderItemsSQL = `INSERT INTO order_items (order_id, book_id, quantity, price)
+						   VALUES ($1, $2, $3, $4)
+						   ON CONFLICT (order_id, book_id) DO UPDATE
+						   SET quantity = EXCLUDED.quantity, price = EXCLUDED.price;`
+
+	ExistsOrderItemsWithOrderId = `SELECT COUNT(*)
+								   FROM order_items
+								   WHERE order_id = $1`
+)
+
 func NewPostgresDB(ctx context.Context, cfg *config.DBConfig) (*pgxpool.Pool, error) {
 	connStr := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
