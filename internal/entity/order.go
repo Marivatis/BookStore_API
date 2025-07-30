@@ -10,6 +10,6 @@ type Order struct {
 }
 
 type OrderItem struct {
-	Product  Product
+	Product  BaseProduct
 	Quantity int
 }
