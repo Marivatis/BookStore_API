@@ -49,6 +49,7 @@ func NewRepository(db *pgxpool.Pool, logger *zap.Logger) *Repository {
 	return &Repository{
 		Book:     NewBookRepository(db, logger),
 		Magazine: NewMagazineRepository(db, logger),
+		Order:    NewOrderRepository(db, logger),
 	}
 }
 
