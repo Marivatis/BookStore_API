@@ -88,11 +88,12 @@ const (
 	GetByOrderIdOrderItemsSQL = `SELECT product_id, quantity, price
 								 FROM order_items
 								 WHERE order_id = $1`
-	UpsertOrderItemsSQL = `INSERT INTO order_items (order_id, book_id, quantity, price)
+	UpsertOrderItemsSQL = `INSERT INTO order_items (order_id, product_id, quantity, price)
 						   VALUES ($1, $2, $3, $4)
-						   ON CONFLICT (order_id, book_id) DO UPDATE
+						   ON CONFLICT (order_id, product_id) DO UPDATE
 						   SET quantity = EXCLUDED.quantity, price = EXCLUDED.price;`
-
+	DeleteByOrderIdOrderItemsSQL = `DELETE FROM order_items
+								    WHERE order_id = $1 AND product_id <> ALL($2)`
 	ExistsOrderItemsWithOrderId = `SELECT COUNT(*)
 								   FROM order_items
 								   WHERE order_id = $1`

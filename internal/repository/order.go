@@ -42,7 +42,7 @@ func (r *OrderRepository) Create(ctx context.Context, order entity.Order) (int, 
 
 	// order insert, returning 'orderId'
 	err = tx.QueryRow(ctx, postgres.InsertOrdersSQL,
-		entity.OrderStatusCreated, start,
+		order.Status, start,
 	).Scan(&orderId)
 	if err != nil {
 		return 0, handleDBError(r.logger, err, "insert_order", start, "failed to insert order")
@@ -90,6 +90,8 @@ func (r *OrderRepository) GetById(ctx context.Context, id int) (entity.Order, er
 	if err != nil {
 		return entity.Order{}, handleDBError(r.logger, err, "get_by_id_order", start, "failed to get order by id")
 	}
+
+	order.Id = id
 
 	rows, err := tx.Query(ctx, postgres.GetByOrderIdOrderItemsSQL, id)
 	if err != nil {
@@ -154,6 +156,18 @@ func (r *OrderRepository) Update(ctx context.Context, order entity.Order) error 
 		if err != nil {
 			return handleDBError(r.logger, err, "update_order_item", start, "failed to update order item")
 		}
+	}
+
+	// preparing items id array
+	ids := make([]int, len(order.Items))
+	for i, item := range order.Items {
+		ids[i] = item.Product.Id
+	}
+
+	// delete unnecessary order items
+	_, err = tx.Exec(ctx, postgres.DeleteByOrderIdOrderItemsSQL, order.Id, ids)
+	if err != nil {
+		return handleDBError(r.logger, err, "delete_order_items", start, "failed to delete unnecessary order items")
 	}
 
 	r.logInfoOrderOperation("update", start, order)
