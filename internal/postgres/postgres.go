@@ -23,6 +23,9 @@ const (
 						 WHERE id = $1`
 	DeleteByIdProductsSQL = `DELETE FROM products
 							 WHERE id = $1`
+	GetByIdsProductsSQL = `SELECT id, type, name, price, stock, created_at
+						  FROM products
+						  WHERE id = ANY($1)`
 )
 
 // books table sql queries

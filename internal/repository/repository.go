@@ -16,6 +16,10 @@ var (
 	ErrDBOperation        = errors.New("database operation failed")
 )
 
+type Product interface {
+	GetByIds(ctx context.Context, ids []int) ([]entity.BaseProduct, error)
+}
+
 type Book interface {
 	Create(ctx context.Context, book entity.Book) (int, error)
 	GetById(ctx context.Context, id int) (entity.Book, error)
@@ -40,6 +44,7 @@ type Order interface {
 }
 
 type Repository struct {
+	Product
 	Book
 	Magazine
 	Order
@@ -47,6 +52,7 @@ type Repository struct {
 
 func NewRepository(db *pgxpool.Pool, logger *zap.Logger) *Repository {
 	return &Repository{
+		Product:  NewProductRepository(db, logger),
 		Book:     NewBookRepository(db, logger),
 		Magazine: NewMagazineRepository(db, logger),
 		Order:    NewOrderRepository(db, logger),
