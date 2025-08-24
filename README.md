@@ -1,7 +1,7 @@
 # Book Store API
 A backend service for managing books, magazines, and customer orders. Written in Go.
 
-This project was built to practice clean architecture, manual SQL handling, and structuring basic domain logic.
+This project was built to practice manual SQL handling and structuring basic domain logic.
 The code is split into layers (entities, DTOs, services, repositories) and uses manual SQL with transaction handling in key operations.
 Configuration is managed via environment variables. All logging is structured with zap.
 
